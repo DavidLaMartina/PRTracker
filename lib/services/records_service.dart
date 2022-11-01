@@ -6,9 +6,10 @@ class RecordsService extends ChangeNotifier {
 
   Stream<List<Record>> onRecords() async* {
     var records = [
-      Record(date: DateTime.now(), videoUri: 'dummy1'),
-      Record(date: DateTime.now(), videoUri: 'dummy2'),
-      Record(date: DateTime.now(), videoUri: 'dummy3')
+      Record(
+          date: DateTime.now(), exercise: 'bench press', pounds: 135, reps: 10),
+      Record(date: DateTime.now(), exercise: 'squat', pounds: 225, reps: 10),
+      Record(date: DateTime.now(), exercise: 'deadlift', pounds: 315, reps: 10),
     ];
     int count = 0;
     yield records;

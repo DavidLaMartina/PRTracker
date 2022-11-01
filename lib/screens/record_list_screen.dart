@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:prtracker/main.dart';
 import 'package:prtracker/models/record.dart';
+import 'package:prtracker/screens/record_details_screen.dart';
 import 'package:prtracker/widgets/pr_tracker_scaffold.dart';
+import '../utils/datetime_utils.dart';
 
 class RecordListScreen extends StatelessWidget {
   static const route = '/';
@@ -23,11 +25,17 @@ class RecordListScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   var record = records[index];
                   return ListTile(
-                      title: Text(record.videoUri ?? ''),
+                      title: Text(
+                          '${dateOnlyString(record.date)} ${record.exercise}'),
                       subtitle: const Text('This is my subtitle.'),
-                      onTap: () {});
+                      onTap: () => listItemOnTap(context, record));
                 });
           }),
     );
+  }
+
+  void listItemOnTap(BuildContext context, Record record) {
+    Navigator.pushNamed(context, RecordDetailsScreen.route,
+        arguments: RecordDetailsScreenArguments(record: record));
   }
 }

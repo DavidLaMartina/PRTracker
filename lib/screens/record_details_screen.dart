@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:prtracker/models/record.dart';
+import 'package:prtracker/utils/datetime_utils.dart';
 import 'package:prtracker/widgets/pr_tracker_scaffold.dart';
+
+class RecordDetailsScreenArguments {
+  final Record record;
+  RecordDetailsScreenArguments({required this.record});
+}
 
 class RecordDetailsScreen extends StatelessWidget {
   static const route = 'recordDetails';
@@ -8,9 +15,34 @@ class RecordDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final record = (ModalRoute.of(context)?.settings.arguments
+            as RecordDetailsScreenArguments)
+        .record;
+
     return PRTrackerScaffold(
-        child: const Placeholder(
-      child: Text('Details screen'),
+        child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+            flex: 2, child: detailsScreenWrapper(dateDisplay(context, record))),
+      ],
     ));
+    // return PRTrackerScaffold(
+    //     child: const Placeholder(
+    //   child: Text('Details screen'),
+    // ));
+  }
+
+  Widget dateDisplay(BuildContext context, Record record) {
+    return Text(
+      dateOnlyString(record.date),
+      style: Theme.of(context).textTheme.bodyText2,
+      textAlign: TextAlign.center,
+    );
+  }
+
+  Widget detailsScreenWrapper(Widget child) {
+    return Center(child: Padding(padding: EdgeInsets.all(10), child: child));
   }
 }
