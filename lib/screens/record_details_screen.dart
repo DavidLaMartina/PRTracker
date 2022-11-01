@@ -20,18 +20,17 @@ class RecordDetailsScreen extends StatelessWidget {
         .record;
 
     return PRTrackerScaffold(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-            flex: 2, child: detailsScreenWrapper(dateDisplay(context, record))),
-      ],
-    ));
-    // return PRTrackerScaffold(
-    //     child: const Placeholder(
-    //   child: Text('Details screen'),
-    // ));
+      fab: null,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+              flex: 2,
+              child: detailsScreenWrapper(dateDisplay(context, record))),
+        ],
+      ),
+    );
   }
 
   Widget dateDisplay(BuildContext context, Record record) {
@@ -43,6 +42,7 @@ class RecordDetailsScreen extends StatelessWidget {
   }
 
   Widget detailsScreenWrapper(Widget child) {
-    return Center(child: Padding(padding: EdgeInsets.all(10), child: child));
+    return Center(
+        child: Padding(padding: const EdgeInsets.all(10), child: child));
   }
 }
