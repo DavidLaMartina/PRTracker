@@ -14,9 +14,17 @@ class RecordsService extends ChangeNotifier {
             units: RecordUnits.POUNDS,
             perSide: false,
           ),
+          reps: 10),
+      Record(
+          date: DateTime.now(),
+          exercise: 'squat',
+          quantity: RecordQuantity(
+            amount: 225,
+            units: RecordUnits.POUNDS,
+            perSide: false,
+          ),
           reps: 10)
     ];
-    int count = 0;
     yield records;
   }
 }
