@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:numberpicker/numberpicker.dart';
 import 'package:prtracker/models/record.dart';
+import 'package:prtracker/widgets/calendar_date_picker.dart';
 
 class RecordEditForm extends StatefulWidget {
   final Record? initialRecord;
 
-  final String? restorationId;
-
-  const RecordEditForm({super.key, this.initialRecord, this.restorationId});
+  const RecordEditForm({
+    super.key,
+    this.initialRecord,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -17,47 +20,23 @@ class RecordEditForm extends StatefulWidget {
 // Location data
 // Pop scope / dirty
 
-class _RecordEditFormState extends State<RecordEditForm> with RestorationMixin {
+class _RecordEditFormState extends State<RecordEditForm> {
   final _formKey = GlobalKey<FormState>();
 
   bool _saving = false;
 
-  final RestorableDateTime _selectedDate = RestorableDateTime(DateTime.now());
-  late final RestorableRouteFuture<DateTime?> _restorableDatePickerRouteFuture =
-      RestorableRouteFuture<DateTime?>(
-    onComplete: _selectDate,
-    onPresent: (NavigatorState navigator, Object? arguments) {
-      return navigator.restorablePush(
-        _datePickerRoute,
-        arguments: _selectedDate.value.millisecondsSinceEpoch,
-      );
-    },
-  );
-
-  static Route<DateTime> _datePickerRoute(
-    BuildContext context,
-    Object? arguments,
-  ) {
-    return DialogRoute<DateTime>(
-        context: context,
-        builder: (BuildContext context) {
-          return DatePickerDialog(
-              restorationId: 'date_picker_dialog',
-              initialEntryMode: DatePickerEntryMode.calendarOnly,
-              initialDate:
-                  DateTime.fromMillisecondsSinceEpoch(arguments! as int),
-              firstDate: DateTime(2021),
-              lastDate: DateTime(2023));
-        });
-  }
+  DateTime _selectedDate = DateTime.now();
+  RecordUnits selectedUnits = RecordUnits.POUNDS;
+  int repsQuantity = 6;
+  late int weightQuantity;
 
   void _selectDate(DateTime? newSelectedDate) {
     if (newSelectedDate != null) {
       setState(() {
-        _selectedDate.value = newSelectedDate;
+        _selectedDate = newSelectedDate;
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
-              'Selected ${_selectedDate.value.month}/${_selectedDate.value.day}/${_selectedDate.value.year}'),
+              'Selected ${_selectedDate.month}/${_selectedDate.day}/${_selectedDate.year}'),
         ));
       });
     }
@@ -67,22 +46,12 @@ class _RecordEditFormState extends State<RecordEditForm> with RestorationMixin {
   TextEditingController? _notesTextController;
 
   @override
-  String? get restorationId => widget.restorationId;
-
-  @override
   void initState() {
     super.initState();
     _exerciseTextController =
         TextEditingController(text: widget.initialRecord?.exercise);
     _notesTextController =
         TextEditingController(text: widget.initialRecord?.notes);
-  }
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_selectedDate, 'selected_date');
-    registerForRestoration(
-        _restorableDatePickerRouteFuture, 'date_picker_route_future');
   }
 
   Future save() async {
@@ -107,22 +76,28 @@ class _RecordEditFormState extends State<RecordEditForm> with RestorationMixin {
                 fit: FlexFit.tight,
                 child: notesForm(),
               ),
+              Flexible(flex: 4, fit: FlexFit.tight, child: unitsDropdown()),
+              Flexible(
+                  flex: 4,
+                  fit: FlexFit.tight,
+                  child: weightQuantityField(context)),
+              Flexible(flex: 4, fit: FlexFit.tight, child: repsPicker()),
               Flexible(
                 flex: 4,
                 fit: FlexFit.tight,
                 child: datePickerButton(),
-              )
+              ),
             ])));
   }
 
   Widget datePickerButton() {
     return Scaffold(
         body: Center(
-      child: OutlinedButton(
-        onPressed: () => _restorableDatePickerRouteFuture.present(),
-        child: const Text('Open date selector'),
-      ),
-    ));
+            child: PRTrackerDatePicker(
+      caption: 'Open date selector',
+      onDateSelected: _selectDate,
+      restorationId: 'record_edit_form',
+    )));
   }
 
   Widget exerciseForm() {
@@ -131,6 +106,7 @@ class _RecordEditFormState extends State<RecordEditForm> with RestorationMixin {
         labelText: 'Exercise',
         border: OutlineInputBorder(),
       ),
+      keyboardType: TextInputType.text,
       controller: _exerciseTextController,
       validator: (val) => val!.isNotEmpty ? null : 'Exercise must not be empty',
     );
@@ -142,6 +118,58 @@ class _RecordEditFormState extends State<RecordEditForm> with RestorationMixin {
           labelText: 'Notes', border: OutlineInputBorder()),
       controller: _notesTextController,
       validator: (val) => val!.isNotEmpty ? null : 'Exercise must not be empty',
+    );
+  }
+
+  Widget weightQuantityField(BuildContext context) {
+    return Padding(
+        padding: EdgeInsets.all(20),
+        child: TextFormField(
+          decoration: const InputDecoration(
+              labelText: 'Quantity', border: OutlineInputBorder()),
+          textAlign: TextAlign.center,
+          keyboardType: TextInputType.number,
+          style: Theme.of(context).textTheme.headline5,
+          validator: (value) => validateWeightQuantity(value!),
+          onSaved: (value) =>
+              setState(() => weightQuantity = int.parse(value!)),
+        ));
+  }
+
+  String? validateWeightQuantity(String? value) {
+    if (value == null || value.isEmpty || int.tryParse(value) == null) {
+      return 'Enter an integer value for the number of pounds, kilograms, or plates.';
+    } else {
+      return null;
+    }
+  }
+
+  Widget repsPicker() {
+    return NumberPicker(
+        minValue: 0,
+        maxValue: 100,
+        value: repsQuantity,
+        onChanged: (quantity) => setState(() => repsQuantity = quantity));
+  }
+
+  // https://api.flutter.dev/flutter/material/showDatePicker.html
+  Widget unitsDropdown() {
+    return DropdownButton<RecordUnits>(
+      items: RecordUnitsMap.entries.map<DropdownMenuItem<RecordUnits>>((entry) {
+        return DropdownMenuItem<RecordUnits>(
+            value: entry.key, child: Text(entry.value));
+      }).toList(),
+      value: selectedUnits,
+      onChanged: (value) {
+        setState(() {
+          selectedUnits = value!;
+        });
+      },
+      icon: const Icon(Icons.arrow_downward),
+      elevation: 16,
+      underline: Container(
+        height: 2,
+      ),
     );
   }
 }

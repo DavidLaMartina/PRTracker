@@ -15,6 +15,7 @@ class App extends StatelessWidget {
     return MaterialApp(
         title: 'PR Tracker',
         theme: ThemeData.dark(),
+        restorationScopeId: 'app',
         initialRoute: RecordListScreen.route,
         routes: routes);
   }

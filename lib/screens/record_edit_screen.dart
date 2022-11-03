@@ -15,10 +15,6 @@ class RecordEditScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PRTrackerScaffold(
-        fab: null,
-        child: const RecordEditForm(
-          restorationId: 'record_edit_screen',
-        ));
+    return PRTrackerScaffold(fab: null, child: const RecordEditForm());
   }
 }

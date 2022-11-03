@@ -33,3 +33,9 @@ enum RecordUnits {
   KILOGRAMS,
   PLATES,
 }
+
+Map<RecordUnits, String> RecordUnitsMap = {
+  RecordUnits.POUNDS: 'lbs.',
+  RecordUnits.KILOGRAMS: 'kg',
+  RecordUnits.PLATES: 'plates'
+};
