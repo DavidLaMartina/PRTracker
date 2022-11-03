@@ -16,19 +16,15 @@ class RecordEditForm extends StatefulWidget {
   _RecordEditFormState createState() => _RecordEditFormState();
 }
 
-// TODOs
-// Location data
-// Pop scope / dirty
-
 class _RecordEditFormState extends State<RecordEditForm> {
   final _formKey = GlobalKey<FormState>();
 
   bool _saving = false;
 
   DateTime _selectedDate = DateTime.now();
-  RecordUnits selectedUnits = RecordUnits.POUNDS;
-  int repsQuantity = 6;
-  late int weightQuantity;
+  RecordUnits _selectedUnits = RecordUnits.POUNDS;
+  int _repsQuantity = 6;
+  late int _weightQuantity;
 
   void _selectDate(DateTime? newSelectedDate) {
     if (newSelectedDate != null) {
@@ -87,6 +83,7 @@ class _RecordEditFormState extends State<RecordEditForm> {
                 fit: FlexFit.tight,
                 child: datePickerButton(),
               ),
+              Flexible(flex: 4, fit: FlexFit.tight, child: saveButton(context))
             ])));
   }
 
@@ -132,7 +129,7 @@ class _RecordEditFormState extends State<RecordEditForm> {
           style: Theme.of(context).textTheme.headline5,
           validator: (value) => validateWeightQuantity(value!),
           onSaved: (value) =>
-              setState(() => weightQuantity = int.parse(value!)),
+              setState(() => _weightQuantity = int.parse(value!)),
         ));
   }
 
@@ -148,8 +145,8 @@ class _RecordEditFormState extends State<RecordEditForm> {
     return NumberPicker(
         minValue: 0,
         maxValue: 100,
-        value: repsQuantity,
-        onChanged: (quantity) => setState(() => repsQuantity = quantity));
+        value: _repsQuantity,
+        onChanged: (quantity) => setState(() => _repsQuantity = quantity));
   }
 
   // https://api.flutter.dev/flutter/material/showDatePicker.html
@@ -159,10 +156,10 @@ class _RecordEditFormState extends State<RecordEditForm> {
         return DropdownMenuItem<RecordUnits>(
             value: entry.key, child: Text(entry.value));
       }).toList(),
-      value: selectedUnits,
+      value: _selectedUnits,
       onChanged: (value) {
         setState(() {
-          selectedUnits = value!;
+          _selectedUnits = value!;
         });
       },
       icon: const Icon(Icons.arrow_downward),
@@ -171,5 +168,53 @@ class _RecordEditFormState extends State<RecordEditForm> {
         height: 2,
       ),
     );
+  }
+
+  Widget saveButton(BuildContext context) {
+    return SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: Semantics(
+          button: true,
+          enabled: true,
+          onLongPressHint: 'Submit record',
+          child: ElevatedButtonTheme(
+            data: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blue)),
+            child: ElevatedButton(
+              child: Text(
+                'Save',
+                style: Theme.of(context).textTheme.headline5,
+              ),
+              onPressed: () => validateAndSave(context),
+            ),
+          ),
+        ));
+  }
+
+  void validateAndSave(BuildContext context) {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    Record newRecord = buildRecord();
+  }
+
+  Record buildRecord() {
+    return Record(
+        date: _selectedDate,
+        quantity: buildRecordQuantity(),
+        reps: _repsQuantity,
+        exercise: _exerciseTextController!.text,
+        notes: _notesTextController!.text,
+        videoUri: null);
+  }
+
+  RecordQuantity buildRecordQuantity() {
+    return RecordQuantity(
+        units: _selectedUnits,
+        amount: _weightQuantity,
+        change: 0,
+        perSide: false);
   }
 }
