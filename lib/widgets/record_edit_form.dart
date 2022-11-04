@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:prtracker/models/record.dart';
+import 'package:prtracker/services/records_service.dart';
 import 'package:prtracker/widgets/calendar_date_picker.dart';
 
 class RecordEditForm extends StatefulWidget {
@@ -18,13 +20,14 @@ class RecordEditForm extends StatefulWidget {
 
 class _RecordEditFormState extends State<RecordEditForm> {
   final _formKey = GlobalKey<FormState>();
+  final RecordsService _recordsService = GetIt.I.get();
 
   bool _saving = false;
 
   DateTime _selectedDate = DateTime.now();
   RecordUnits _selectedUnits = RecordUnits.POUNDS;
   int _repsQuantity = 6;
-  late int _weightQuantity;
+  int _weightQuantity = 135;
 
   void _selectDate(DateTime? newSelectedDate) {
     if (newSelectedDate != null) {
@@ -193,11 +196,12 @@ class _RecordEditFormState extends State<RecordEditForm> {
         ));
   }
 
-  void validateAndSave(BuildContext context) {
+  void validateAndSave(BuildContext context) async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
     Record newRecord = buildRecord();
+    await _recordsService.insertRecord(newRecord);
   }
 
   Record buildRecord() {

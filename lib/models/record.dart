@@ -19,7 +19,7 @@ class Record {
 
   Map<String, dynamic> toMap() {
     return {
-      'date': date,
+      'date': date.toString(),
       'exercise': exercise,
       'quantity': quantity.toMap(),
       'reps': reps,
@@ -31,7 +31,7 @@ class Record {
   factory Record.fromMap(int id, Map<String, dynamic> map) {
     return Record(
         id: id,
-        date: map['date'],
+        date: DateTime.parse(map['date']),
         exercise: map['exercise'],
         quantity: RecordQuantity.fromMap(map['quantity']),
         reps: map['reps'],
