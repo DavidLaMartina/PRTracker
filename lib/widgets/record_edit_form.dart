@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:prtracker/models/record.dart';
 import 'package:prtracker/services/records_service.dart';
 import 'package:prtracker/widgets/calendar_date_picker.dart';
+import 'package:prtracker/widgets/video_picker.dart';
 
 class RecordEditForm extends StatefulWidget {
   final Record? initialRecord;
@@ -28,6 +30,7 @@ class _RecordEditFormState extends State<RecordEditForm> {
   RecordUnits _selectedUnits = RecordUnits.POUNDS;
   int _repsQuantity = 6;
   int _weightQuantity = 135;
+  XFile? _videoFile;
 
   void _selectDate(DateTime? newSelectedDate) {
     if (newSelectedDate != null) {
@@ -39,6 +42,10 @@ class _RecordEditFormState extends State<RecordEditForm> {
         ));
       });
     }
+  }
+
+  void _selectVideo(XFile? videoFile) {
+    _videoFile = videoFile;
   }
 
   TextEditingController? _exerciseTextController;
@@ -81,6 +88,10 @@ class _RecordEditFormState extends State<RecordEditForm> {
                   fit: FlexFit.tight,
                   child: weightQuantityField(context)),
               Flexible(flex: 4, fit: FlexFit.tight, child: repsPicker()),
+              Flexible(
+                  flex: 4,
+                  fit: FlexFit.tight,
+                  child: VideoPickerButton(onVideoPicked: _selectVideo)),
               Flexible(
                 flex: 4,
                 fit: FlexFit.tight,
