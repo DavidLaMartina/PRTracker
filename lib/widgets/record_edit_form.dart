@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:prtracker/models/record.dart';
 import 'package:prtracker/services/records_service.dart';
+import 'package:prtracker/utils/file_utils.dart';
 import 'package:prtracker/widgets/calendar_date_picker.dart';
 import 'package:prtracker/widgets/video_picker_button.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
@@ -26,8 +28,7 @@ class RecordEditForm extends StatefulWidget {
 class _RecordEditFormState extends State<RecordEditForm> {
   final _formKey = GlobalKey<FormState>();
   final RecordsService _recordsService = GetIt.I.get();
-
-  bool _saving = false;
+  // final Directory _mediaDirectory = GetIt.I.get();
 
   DateTime _selectedDate = DateTime.now();
   RecordUnits _selectedUnits = RecordUnits.POUNDS;
@@ -180,6 +181,7 @@ class _RecordEditFormState extends State<RecordEditForm> {
     );
   }
 
+  XFile? _pickedVideo;
   String? _pickedVideoFilepath;
   String? _pickedVideoThumbnailFilepath;
   final ImagePicker _videoPicker = ImagePicker();
@@ -188,9 +190,9 @@ class _RecordEditFormState extends State<RecordEditForm> {
   // user to select their own time.
 
   Future _pickVideo() async {
-    XFile? pickedVideo =
-        await _videoPicker.pickVideo(source: ImageSource.gallery);
-    final pickedVideoFilepath = pickedVideo?.path;
+    _pickedVideo = await _videoPicker.pickVideo(source: ImageSource.gallery);
+
+    final pickedVideoFilepath = _pickedVideo?.path;
     if (pickedVideoFilepath == null) {
       return;
     }
@@ -216,7 +218,8 @@ class _RecordEditFormState extends State<RecordEditForm> {
 
   Widget thumbnailDisplay() {
     return _pickedVideoThumbnailFilepath != null
-        ? Image.file(File(_pickedVideoThumbnailFilepath!))
+        ? Image.file(File(path.join(_recordsService.appDocumentsDirectoryPath,
+            _pickedVideoThumbnailFilepath)))
         : const Placeholder();
   }
 
@@ -247,19 +250,29 @@ class _RecordEditFormState extends State<RecordEditForm> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    Record newRecord = buildRecord();
+    String videoRelativePath = '';
+    String videoThumbnailRelativePath = '';
+    String appDocPath = (await getApplicationDocumentsDirectory()).path;
+    if (_pickedVideoFilepath != null) {
+      videoRelativePath = await saveXFileToDisk(_pickedVideo!, appDocPath);
+      videoThumbnailRelativePath = await saveFileToDiskByPath(
+          _pickedVideoThumbnailFilepath!, appDocPath);
+    }
+    Record newRecord = buildRecord(
+        videoUri: videoRelativePath,
+        videoThumbnailUri: videoThumbnailRelativePath);
     await _recordsService.insertRecord(newRecord);
   }
 
-  Record buildRecord() {
+  Record buildRecord({String videoUri = '', String videoThumbnailUri = ''}) {
     return Record(
         date: _selectedDate,
         quantity: buildRecordQuantity(),
         reps: _repsQuantity,
         exercise: _exerciseTextController!.text,
         notes: _notesTextController!.text,
-        videoUri: _pickedVideoFilepath,
-        thumbnailUri: _pickedVideoThumbnailFilepath);
+        videoUri: videoUri.isNotEmpty ? videoUri : null,
+        thumbnailUri: videoThumbnailUri.isNotEmpty ? videoThumbnailUri : null);
   }
 
   RecordQuantity buildRecordQuantity() {

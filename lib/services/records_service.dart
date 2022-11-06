@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
+import 'package:path/path.dart';
 import 'package:sembast/sembast.dart';
 import 'package:prtracker/models/record.dart';
 
@@ -39,8 +40,19 @@ class Records extends ListBase<Record> {
 // for the general scheme of a sembast repository and init class
 
 class RecordsService extends ChangeNotifier {
+  final String appDocumentsDirectoryPath;
   final Database _database = GetIt.I.get();
   final _store = intMapStoreFactory.store('records_store');
+
+  RecordsService({required this.appDocumentsDirectoryPath});
+
+  String? getRecordThumbnailUri(Record record) {
+    return join(appDocumentsDirectoryPath, record.thumbnailUri);
+  }
+
+  String? getRecordViedoUri(Record record) {
+    return join(appDocumentsDirectoryPath, record.videoUri);
+  }
 
   Future<int> insertRecord(Record record) async {
     return await _store.add(_database, record.toMap());
@@ -73,28 +85,4 @@ class RecordsService extends ChangeNotifier {
         .onSnapshots(_database)
         .transform(recordsTransformer);
   }
-
-  // Stream<List<Record>> onRecords() async* {
-  //   var records = [
-  //     Record(
-  //         date: DateTime.now(),
-  //         exercise: 'bench press',
-  //         quantity: RecordQuantity(
-  //           amount: 135,
-  //           units: RecordUnits.POUNDS,
-  //           perSide: false,
-  //         ),
-  //         reps: 10),
-  //     Record(
-  //         date: DateTime.now(),
-  //         exercise: 'squat',
-  //         quantity: RecordQuantity(
-  //           amount: 225,
-  //           units: RecordUnits.POUNDS,
-  //           perSide: false,
-  //         ),
-  //         reps: 10)
-  //   ];
-  //   yield records;
-  // }
 }
