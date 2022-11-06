@@ -184,6 +184,9 @@ class _RecordEditFormState extends State<RecordEditForm> {
   String? _pickedVideoThumbnailFilepath;
   final ImagePicker _videoPicker = ImagePicker();
 
+  // TODO: Auto-choose time in the middle of the clip for thumbnail and / or allow
+  // user to select their own time.
+
   Future _pickVideo() async {
     XFile? pickedVideo =
         await _videoPicker.pickVideo(source: ImageSource.gallery);
@@ -193,8 +196,10 @@ class _RecordEditFormState extends State<RecordEditForm> {
     }
     final pickedVideoThumbnailFilepath = await VideoThumbnail.thumbnailFile(
         video: pickedVideoFilepath,
-        thumbnailPath: (await getTemporaryDirectory()).path,
-        imageFormat: ImageFormat.PNG);
+        thumbnailPath: (await getApplicationDocumentsDirectory()).path,
+        imageFormat: ImageFormat.PNG,
+        timeMs: 1,
+        quality: 50);
     setState(() {
       _pickedVideoFilepath = pickedVideoFilepath;
       _pickedVideoThumbnailFilepath = pickedVideoThumbnailFilepath;

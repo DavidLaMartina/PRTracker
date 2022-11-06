@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:prtracker/models/record.dart';
 import 'package:prtracker/screens/record_details_screen.dart';
@@ -37,14 +38,32 @@ class _RecordsListScreenState extends State<RecordListScreen> {
                 itemCount: records.length,
                 itemBuilder: (context, index) {
                   var record = records[index];
-                  return ListTile(
-                      title: Text(
-                          '${dateOnlyString(record.date)} ${record.exercise}'),
-                      subtitle: const Text('This is my subtitle.'),
-                      onTap: () => listItemOnTap(context, record));
+                  return recordListTile(context, record);
                 });
           }),
     );
+  }
+
+  Widget recordListTile(BuildContext context, Record record) {
+    return Slidable(
+        startActionPane: ActionPane(
+            motion: const ScrollMotion(),
+            dismissible: DismissiblePane(onDismissed: () {}),
+            children: record.id != null ? slideActions(record.id!) : []),
+        child: ListTile(
+            title: Text('${dateOnlyString(record.date)} ${record.exercise}'),
+            subtitle: const Text('This is my subtitle.'),
+            onTap: () => listItemOnTap(context, record)));
+  }
+
+  List<SlidableAction> slideActions(int recordId) {
+    return <SlidableAction>[
+      SlidableAction(
+        onPressed: (((context) => _recordsService.deleteRecord(recordId))),
+        icon: Icons.delete,
+        label: 'Delete Record',
+      )
+    ];
   }
 
   void listItemOnTap(BuildContext context, Record record) {
