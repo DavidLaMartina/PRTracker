@@ -1,11 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:prtracker/models/record.dart';
 import 'package:prtracker/services/records_service.dart';
 import 'package:prtracker/widgets/calendar_date_picker.dart';
-import 'package:prtracker/widgets/video_picker.dart';
+import 'package:prtracker/widgets/video_picker_button.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class RecordEditForm extends StatefulWidget {
   final Record? initialRecord;
@@ -89,14 +92,11 @@ class _RecordEditFormState extends State<RecordEditForm> {
                   child: weightQuantityField(context)),
               Flexible(flex: 4, fit: FlexFit.tight, child: repsPicker()),
               Flexible(
-                  flex: 4,
-                  fit: FlexFit.tight,
-                  child: VideoPickerButton(onVideoPicked: _selectVideo)),
-              Flexible(
                 flex: 4,
                 fit: FlexFit.tight,
                 child: datePickerButton(),
               ),
+              Flexible(flex: 4, fit: FlexFit.tight, child: videoPickerButton()),
               Flexible(flex: 4, fit: FlexFit.tight, child: saveButton(context))
             ])));
   }
@@ -182,6 +182,39 @@ class _RecordEditFormState extends State<RecordEditForm> {
         height: 2,
       ),
     );
+  }
+
+  String? _pickedVideoFilepath;
+  String? _pickedVideoThumbnailFilepath;
+  final ImagePicker _videoPicker = ImagePicker();
+
+  Future _pickVideo() async {
+    XFile? pickedVideo =
+        await _videoPicker.pickVideo(source: ImageSource.gallery);
+    final pickedVideoFilepath = pickedVideo?.path;
+    if (pickedVideoFilepath != null) {}
+    final pickedVideoThumbnailFilepath = await VideoThumbnail.thumbnailFile(
+        video: pickedVideoFilepath!,
+        thumbnailPath: (await getTemporaryDirectory()).path,
+        imageFormat: ImageFormat.PNG);
+    setState(() {
+      _pickedVideoFilepath = pickedVideoFilepath;
+      _pickedVideoThumbnailFilepath = pickedVideoThumbnailFilepath;
+    });
+  }
+
+  Widget videoPickerButton() {
+    return ElevatedButton(
+        onPressed: () async {
+          await _pickVideo();
+        },
+        child: thumbnailDisplay());
+  }
+
+  Widget thumbnailDisplay() {
+    return _pickedVideoThumbnailFilepath != null
+        ? Image.file(File(_pickedVideoThumbnailFilepath!))
+        : const Placeholder();
   }
 
   Widget saveButton(BuildContext context) {
