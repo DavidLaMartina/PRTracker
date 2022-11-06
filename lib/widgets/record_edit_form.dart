@@ -33,7 +33,7 @@ class _RecordEditFormState extends State<RecordEditForm> {
   RecordUnits _selectedUnits = RecordUnits.POUNDS;
   int _repsQuantity = 6;
   int _weightQuantity = 135;
-  XFile? _videoFile;
+  // XFile? _videoFile;
 
   void _selectDate(DateTime? newSelectedDate) {
     if (newSelectedDate != null) {
@@ -45,10 +45,6 @@ class _RecordEditFormState extends State<RecordEditForm> {
         ));
       });
     }
-  }
-
-  void _selectVideo(XFile? videoFile) {
-    _videoFile = videoFile;
   }
 
   TextEditingController? _exerciseTextController;
@@ -192,9 +188,11 @@ class _RecordEditFormState extends State<RecordEditForm> {
     XFile? pickedVideo =
         await _videoPicker.pickVideo(source: ImageSource.gallery);
     final pickedVideoFilepath = pickedVideo?.path;
-    if (pickedVideoFilepath != null) {}
+    if (pickedVideoFilepath == null) {
+      return;
+    }
     final pickedVideoThumbnailFilepath = await VideoThumbnail.thumbnailFile(
-        video: pickedVideoFilepath!,
+        video: pickedVideoFilepath,
         thumbnailPath: (await getTemporaryDirectory()).path,
         imageFormat: ImageFormat.PNG);
     setState(() {
@@ -255,7 +253,8 @@ class _RecordEditFormState extends State<RecordEditForm> {
         reps: _repsQuantity,
         exercise: _exerciseTextController!.text,
         notes: _notesTextController!.text,
-        videoUri: null);
+        videoUri: _pickedVideoFilepath,
+        thumbnailUri: _pickedVideoThumbnailFilepath);
   }
 
   RecordQuantity buildRecordQuantity() {

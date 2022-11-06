@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:prtracker/main.dart';
 import 'package:prtracker/models/record.dart';
 import 'package:prtracker/screens/record_details_screen.dart';
 import 'package:prtracker/screens/record_edit_screen.dart';
