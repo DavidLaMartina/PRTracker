@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_it/get_it.dart';
@@ -67,8 +68,13 @@ class _RecordsListScreenState extends State<RecordListScreen> {
 
   Widget trailingImage(Record record) {
     if (record.thumbnailUri != null) {
-      return Image.file(
-          _localMediaService.openFileFromDisk(record.thumbnailUri!));
+      try {
+        File imageFile =
+            _localMediaService.openFileFromDisk(record.thumbnailUri!);
+        return Image.file(imageFile);
+      } catch (err) {
+        return const FittedBox();
+      }
     } else {
       return const FittedBox();
     }
