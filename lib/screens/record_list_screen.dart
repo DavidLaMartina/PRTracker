@@ -1,11 +1,10 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_it/get_it.dart';
-import 'package:path/path.dart' as path;
 import 'package:prtracker/models/record.dart';
 import 'package:prtracker/screens/record_details_screen.dart';
 import 'package:prtracker/screens/record_edit_screen.dart';
+import 'package:prtracker/services/local_media_service.dart';
 import 'package:prtracker/services/records_service.dart';
 import 'package:prtracker/widgets/pr_tracker_scaffold.dart';
 import '../utils/datetime_utils.dart';
@@ -19,6 +18,7 @@ class RecordListScreen extends StatefulWidget {
 
 class _RecordsListScreenState extends State<RecordListScreen> {
   final RecordsService _recordsService = GetIt.I.get();
+  final LocalMediaService _localMediaService = GetIt.I.get();
 
   @override
   initState() {
@@ -67,8 +67,8 @@ class _RecordsListScreenState extends State<RecordListScreen> {
 
   Widget trailingImage(Record record) {
     if (record.thumbnailUri != null) {
-      return Image.file(File(path.join(
-          _recordsService.appDocumentsDirectoryPath, record.thumbnailUri!)));
+      return Image.file(
+          _localMediaService.openFileFromDisk(record.thumbnailUri!));
     } else {
       return const FittedBox();
     }

@@ -11,3 +11,5 @@ const String UNITS_KEY = 'units';
 const String AMOUNT_KEY = 'amount';
 const String CHANGE_KEY = 'change';
 const String PERSIDE_KEY = 'perSide';
+
+const String MEDIA_DIR_NAME = 'media';

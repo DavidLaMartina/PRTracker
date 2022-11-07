@@ -40,19 +40,8 @@ class Records extends ListBase<Record> {
 // for the general scheme of a sembast repository and init class
 
 class RecordsService extends ChangeNotifier {
-  final String appDocumentsDirectoryPath;
   final Database _database = GetIt.I.get();
   final _store = intMapStoreFactory.store('records_store');
-
-  RecordsService({required this.appDocumentsDirectoryPath});
-
-  String? getRecordThumbnailUri(Record record) {
-    return join(appDocumentsDirectoryPath, record.thumbnailUri);
-  }
-
-  String? getRecordViedoUri(Record record) {
-    return join(appDocumentsDirectoryPath, record.videoUri);
-  }
 
   Future<int> insertRecord(Record record) async {
     return await _store.add(_database, record.toMap());
