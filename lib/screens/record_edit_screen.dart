@@ -4,8 +4,8 @@ import 'package:prtracker/widgets/pr_tracker_scaffold.dart';
 import 'package:prtracker/widgets/record_edit_form.dart';
 
 class RecordEditScreenArguments {
-  final Record? iniitalRecord;
-  RecordEditScreenArguments({required this.iniitalRecord});
+  final Record? initialRecord;
+  RecordEditScreenArguments({required this.initialRecord});
 }
 
 class RecordEditScreen extends StatelessWidget {
@@ -15,6 +15,10 @@ class RecordEditScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PRTrackerScaffold(fab: null, child: const RecordEditForm());
+    final initialRecord = (ModalRoute.of(context)?.settings.arguments
+            as RecordEditScreenArguments)
+        .initialRecord;
+    return PRTrackerScaffold(
+        fab: null, child: RecordEditForm(initialRecord: initialRecord));
   }
 }

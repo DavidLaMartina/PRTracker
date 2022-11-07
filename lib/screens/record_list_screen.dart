@@ -14,6 +14,7 @@ class RecordListScreen extends StatefulWidget {
   static const route = '/';
 
   @override
+  // ignore: library_private_types_in_public_api
   _RecordsListScreenState createState() => _RecordsListScreenState();
 }
 
@@ -52,8 +53,8 @@ class _RecordsListScreenState extends State<RecordListScreen> {
   Widget recordListTile(BuildContext context, Record record) {
     return Slidable(
         key: ValueKey(record.hashCode),
-        startActionPane: recordListTileActionPane(context, record),
-        endActionPane: recordListTileActionPane(context, record),
+        startActionPane: recordListTileStartActionPane(context, record),
+        endActionPane: recordListTileEndActionPane(context, record),
         child: ListTile(
             title: Text('${dateOnlyString(record.date)} ${record.exercise}'),
             subtitle: const Text('This is my subtitle.'),
@@ -80,14 +81,22 @@ class _RecordsListScreenState extends State<RecordListScreen> {
     }
   }
 
-  ActionPane recordListTileActionPane(BuildContext context, Record record) {
+  ActionPane recordListTileStartActionPane(
+      BuildContext context, Record record) {
     return ActionPane(
         motion: const ScrollMotion(),
         dismissible: DismissiblePane(onDismissed: () {}),
-        children: record.id != null ? slideActions(record.id!) : []);
+        children: record.id != null ? startSlideActions(record.id!) : []);
   }
 
-  List<SlidableAction> slideActions(int recordId) {
+  ActionPane recordListTileEndActionPane(BuildContext context, Record record) {
+    return ActionPane(
+        motion: const ScrollMotion(),
+        dismissible: DismissiblePane(onDismissed: () {}),
+        children: endSlideActions(record));
+  }
+
+  List<SlidableAction> startSlideActions(int recordId) {
     return <SlidableAction>[
       SlidableAction(
         onPressed: (((context) => _recordsService.deleteRecord(recordId))),
@@ -95,6 +104,20 @@ class _RecordsListScreenState extends State<RecordListScreen> {
         label: 'Delete Record',
       )
     ];
+  }
+
+  List<SlidableAction> endSlideActions(Record record) {
+    return <SlidableAction>[
+      SlidableAction(
+          onPressed: ((context) => openEditScreenForRecord(record)),
+          icon: Icons.edit,
+          label: 'Edit Record')
+    ];
+  }
+
+  void openEditScreenForRecord(Record record) {
+    Navigator.pushNamed(context, RecordEditScreen.route,
+        arguments: RecordEditScreenArguments(initialRecord: record));
   }
 
   void listItemOnTap(BuildContext context, Record record) {
@@ -112,6 +135,6 @@ class _RecordsListScreenState extends State<RecordListScreen> {
 
   void newRecordButtonPressed(BuildContext context) {
     Navigator.pushNamed(context, RecordEditScreen.route,
-        arguments: RecordEditScreenArguments(iniitalRecord: null));
+        arguments: RecordEditScreenArguments(initialRecord: null));
   }
 }

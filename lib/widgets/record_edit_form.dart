@@ -37,26 +37,25 @@ class _RecordEditFormState extends State<RecordEditForm> {
 
   TextEditingController? _exerciseTextController;
   TextEditingController? _notesTextController;
-
-  void _selectDate(DateTime? newSelectedDate) {
-    if (newSelectedDate != null) {
-      setState(() {
-        _selectedDate = newSelectedDate;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              'Selected ${_selectedDate.month}/${_selectedDate.day}/${_selectedDate.year}'),
-        ));
-      });
-    }
-  }
+  TextEditingController? _weightQuantityTextController;
 
   @override
   void initState() {
     super.initState();
+    _selectedDate = widget.initialRecord?.date ?? DateTime.now();
+    _selectedUnits = widget.initialRecord?.quantity.units ?? RecordUnits.POUNDS;
+    _repsQuantity = widget.initialRecord?.reps ?? 6;
+    // _weightQuantity = widget.initialRecord?.quantity.amount ?? 135;
+    _pickedVideoThumbnailFile = widget.initialRecord?.thumbnailUri != null
+        ? _localMediaService
+            .openFileFromDisk(widget.initialRecord!.thumbnailUri!)
+        : null;
     _exerciseTextController =
         TextEditingController(text: widget.initialRecord?.exercise);
     _notesTextController =
         TextEditingController(text: widget.initialRecord?.notes);
+    _weightQuantityTextController = TextEditingController(
+        text: widget.initialRecord?.quantity.amount.toString());
   }
 
   @override
@@ -91,6 +90,18 @@ class _RecordEditFormState extends State<RecordEditForm> {
               Flexible(flex: 4, fit: FlexFit.tight, child: videoPickerButton()),
               Flexible(flex: 4, fit: FlexFit.tight, child: saveButton(context))
             ])));
+  }
+
+  void _selectDate(DateTime? newSelectedDate) {
+    if (newSelectedDate != null) {
+      setState(() {
+        _selectedDate = newSelectedDate;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+              'Selected ${_selectedDate.month}/${_selectedDate.day}/${_selectedDate.year}'),
+        ));
+      });
+    }
   }
 
   Widget datePickerButton() {
@@ -128,14 +139,13 @@ class _RecordEditFormState extends State<RecordEditForm> {
     return Padding(
         padding: const EdgeInsets.all(20),
         child: TextFormField(
+          controller: _weightQuantityTextController,
           decoration: const InputDecoration(
               labelText: 'Quantity', border: OutlineInputBorder()),
           textAlign: TextAlign.center,
           keyboardType: TextInputType.number,
           style: Theme.of(context).textTheme.headline5,
           validator: (value) => validateWeightQuantity(value!),
-          onSaved: (value) =>
-              setState(() => _weightQuantity = int.parse(value!)),
         ));
   }
 
@@ -234,7 +244,16 @@ class _RecordEditFormState extends State<RecordEditForm> {
       return;
     }
     Record newRecord = await buildRecord();
-    await _recordsService.insertRecord(newRecord);
+    await saveRecord(newRecord);
+  }
+
+  Future<void> saveRecord(Record record) async {
+    if (widget.initialRecord != null && widget.initialRecord!.id != null) {
+      record.id = widget.initialRecord!.id;
+      await _recordsService.updateRecord(record);
+    } else {
+      await _recordsService.insertRecord(record);
+    }
   }
 
   Future<Record> buildRecord(
@@ -253,7 +272,7 @@ class _RecordEditFormState extends State<RecordEditForm> {
   RecordQuantity buildRecordQuantity() {
     return RecordQuantity(
         units: _selectedUnits,
-        amount: _weightQuantity,
+        amount: int.parse(_weightQuantityTextController!.text),
         change: 0,
         perSide: false);
   }
