@@ -229,22 +229,28 @@ class _RecordEditFormState extends State<RecordEditForm> {
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.blue)),
             child: ElevatedButton(
+              onPressed: (() async {
+                if (await validateAndSave()) {
+                  Navigator.pop(context);
+                }
+              }),
               child: Text(
                 'Save',
                 style: Theme.of(context).textTheme.headline5,
               ),
-              onPressed: () => validateAndSave(context),
+              // onPressed: () => validateAndSave(context),
             ),
           ),
         ));
   }
 
-  void validateAndSave(BuildContext context) async {
+  Future<bool> validateAndSave() async {
     if (!_formKey.currentState!.validate()) {
-      return;
+      return false;
     }
     Record newRecord = await buildRecord();
     await saveRecord(newRecord);
+    return true;
   }
 
   Future<void> saveRecord(Record record) async {
