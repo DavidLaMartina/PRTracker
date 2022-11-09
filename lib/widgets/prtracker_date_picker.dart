@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 // Ideas / content from https://api.flutter.dev/flutter/material/showDatePicker.html
 class PRTrackerDatePicker extends StatefulWidget {
@@ -47,7 +48,7 @@ class _PRTrackerDatePickerState extends State<PRTrackerDatePicker>
         body: Center(
             child: OutlinedButton(
                 onPressed: () => _restorableDatePickerRouteFuture.present(),
-                child: const Text('Open date selector'))));
+                child: Text(DateFormat.yMd().format(_selectedDate.value)))));
   }
 
   late final RestorableRouteFuture<DateTime?> _restorableDatePickerRouteFuture =

@@ -4,9 +4,10 @@ import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:prtracker/models/record.dart';
+import 'package:prtracker/screens/record_list_screen.dart';
 import 'package:prtracker/services/local_media_service.dart';
 import 'package:prtracker/services/records_service.dart';
-import 'package:prtracker/widgets/calendar_date_picker.dart';
+import 'package:prtracker/widgets/prtracker_date_picker.dart';
 
 class RecordEditForm extends StatefulWidget {
   final Record? initialRecord;
@@ -92,14 +93,11 @@ class _RecordEditFormState extends State<RecordEditForm> {
             ])));
   }
 
+  // TODO: SHOW the currently selected date, don't just confirm its selection
   void _selectDate(DateTime? newSelectedDate) {
     if (newSelectedDate != null) {
       setState(() {
         _selectedDate = newSelectedDate;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              'Selected ${_selectedDate.month}/${_selectedDate.day}/${_selectedDate.year}'),
-        ));
       });
     }
   }
@@ -231,14 +229,18 @@ class _RecordEditFormState extends State<RecordEditForm> {
             child: ElevatedButton(
               onPressed: (() async {
                 if (await validateAndSave()) {
-                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                        'Successfully ${widget.initialRecord == null ? 'saved' : 'updated'} record'),
+                  ));
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, RecordListScreen.route, (r) => false);
                 }
               }),
               child: Text(
-                'Save',
+                widget.initialRecord == null ? 'Save' : 'Update',
                 style: Theme.of(context).textTheme.headline5,
               ),
-              // onPressed: () => validateAndSave(context),
             ),
           ),
         ));
