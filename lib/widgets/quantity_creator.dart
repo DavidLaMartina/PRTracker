@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:prtracker/models/record.dart';
 
 class QuantityCreator extends StatefulWidget {
+  final Function(RecordQuantity) onParentSaved;
   final RecordQuantity? initialQuantity;
 
   const QuantityCreator({
     super.key,
+    required this.onParentSaved,
     this.initialQuantity,
   });
 
@@ -27,21 +29,28 @@ class _QuantityCreatorState extends State<QuantityCreator> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: weightQuantityField(),
-          ),
-        ),
-        Flexible(
-            child: Padding(
-                padding: const EdgeInsets.all(20), child: unitsDropdown()))
-      ],
+    return FormField<RecordQuantity>(
+      builder: (formFieldState) {
+        return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                  child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: weightQuantityField())),
+              Flexible(
+                  child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: unitsDropdown()))
+            ]);
+      },
     );
+  }
+
+  void onSaved() {
+    final RecordQuantity recordQuantity = buildRecordQuantity();
+    widget.onParentSaved(recordQuantity);
   }
 
   Widget weightQuantityField() {

@@ -58,26 +58,21 @@ class _RecordsListScreenState extends State<RecordListScreen> {
         child: ListTile(
             title: Text('${dateOnlyString(record.date)} ${record.exercise}'),
             subtitle: const Text('This is my subtitle.'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                trailingImage(record),
-              ],
-            ),
+            trailing: trailingImage(record),
             onTap: () => listItemOnTap(context, record)));
   }
 
-  Widget trailingImage(Record record) {
+  Widget? trailingImage(Record record) {
     if (record.thumbnailUri != null) {
       try {
         File imageFile =
             _localMediaService.openFileFromDisk(record.thumbnailUri!);
         return Image.file(imageFile);
       } catch (err) {
-        return const FittedBox();
+        return null;
       }
     } else {
-      return const FittedBox();
+      return null;
     }
   }
 

@@ -8,7 +8,6 @@ import 'package:prtracker/models/record.dart';
 import 'package:prtracker/screens/record_list_screen.dart';
 import 'package:prtracker/services/local_media_service.dart';
 import 'package:prtracker/services/records_service.dart';
-import 'package:prtracker/widgets/quantity_creator.dart';
 
 class RecordEditForm extends StatefulWidget {
   final Record? initialRecord;
@@ -39,13 +38,12 @@ class _RecordEditFormState extends State<RecordEditForm> {
   TextEditingController? _exerciseTextController;
   TextEditingController? _notesTextController;
   TextEditingController? _weightQuantityTextController;
-  QuantityCreator? _quantityCreator;
 
   @override
   void initState() {
     super.initState();
     _selectedDate = widget.initialRecord?.date ?? DateTime.now();
-    // _selectedUnits = widget.initialRecord?.quantity.units ?? RecordUnits.POUNDS;
+    _selectedUnits = widget.initialRecord?.quantity.units ?? RecordUnits.POUNDS;
     _repsQuantity = widget.initialRecord?.reps ?? 6;
     _pickedVideoThumbnailFile = widget.initialRecord?.thumbnailUri != null
         ? _localMediaService
@@ -55,11 +53,8 @@ class _RecordEditFormState extends State<RecordEditForm> {
         TextEditingController(text: widget.initialRecord?.exercise);
     _notesTextController =
         TextEditingController(text: widget.initialRecord?.notes);
-    // _weightQuantityTextController = TextEditingController(
-    //     text: widget.initialRecord?.quantity.amount.toString());
-    _quantityCreator = QuantityCreator(
-      initialQuantity: widget.initialRecord?.quantity,
-    );
+    _weightQuantityTextController = TextEditingController(
+        text: widget.initialRecord?.quantity.amount.toString());
   }
 
   @override
@@ -80,12 +75,19 @@ class _RecordEditFormState extends State<RecordEditForm> {
                 fit: FlexFit.tight,
                 child: notesForm(),
               ),
-              Flexible(fit: FlexFit.tight, flex: 4, child: _quantityCreator!),
-              // Flexible(flex: 4, fit: FlexFit.tight, child: unitsDropdown()),
-              // Flexible(
-              //     flex: 4,
-              //     fit: FlexFit.tight,
-              //     child: weightQuantityField(context)),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                        child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: weightQuantityField(context))),
+                    Flexible(
+                        child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: unitsDropdown()))
+                  ]),
               Flexible(flex: 4, fit: FlexFit.tight, child: repsPicker()),
               Flexible(
                 flex: 4,
@@ -187,7 +189,6 @@ class _RecordEditFormState extends State<RecordEditForm> {
 
   // TODO: Auto-choose time in the middle of the clip for thumbnail and / or allow
   // user to select their own time.
-
   Future _pickVideo() async {
     final pickedVideoFile =
         await _videoPicker.pickVideo(source: ImageSource.gallery);
@@ -268,13 +269,17 @@ class _RecordEditFormState extends State<RecordEditForm> {
       {String? videoUri, String? videoThumbnailUri}) async {
     return Record(
         date: _selectedDate,
-        quantity: buildRecordQuantity(),
+        quantity: RecordQuantity(
+            units: RecordUnits.POUNDS, amount: 23, perSide: false),
         reps: _repsQuantity,
         exercise: _exerciseTextController!.text,
         notes: _notesTextController!.text,
-        videoUri: await _localMediaService.saveXFileToDisk(_pickedVideoFile),
-        thumbnailUri:
-            await _localMediaService.saveFileToDisk(_pickedVideoThumbnailFile));
+        videoUri: _pickedVideoFile != null
+            ? await _localMediaService.saveXFileToDisk(_pickedVideoFile)
+            : null,
+        thumbnailUri: _pickedVideoThumbnailFile != null
+            ? await _localMediaService.saveFileToDisk(_pickedVideoThumbnailFile)
+            : null);
   }
 
   RecordQuantity buildRecordQuantity() {
