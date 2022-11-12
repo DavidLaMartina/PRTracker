@@ -85,15 +85,12 @@ class _RecordsListScreenState extends State<RecordListScreen> {
       BuildContext context, Record record) {
     return ActionPane(
         motion: const ScrollMotion(),
-        dismissible: DismissiblePane(onDismissed: () {}),
         children: record.id != null ? startSlideActions(record.id!) : []);
   }
 
   ActionPane recordListTileEndActionPane(BuildContext context, Record record) {
     return ActionPane(
-        motion: const ScrollMotion(),
-        dismissible: DismissiblePane(onDismissed: () {}),
-        children: endSlideActions(record));
+        motion: const ScrollMotion(), children: endSlideActions(record));
   }
 
   List<SlidableAction> startSlideActions(int recordId) {

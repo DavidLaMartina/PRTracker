@@ -2,12 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:prtracker/models/record.dart';
 import 'package:prtracker/screens/record_list_screen.dart';
 import 'package:prtracker/services/local_media_service.dart';
 import 'package:prtracker/services/records_service.dart';
-import 'package:prtracker/widgets/prtracker_date_picker.dart';
+import 'package:prtracker/widgets/quantity_creator.dart';
 
 class RecordEditForm extends StatefulWidget {
   final Record? initialRecord;
@@ -31,7 +32,6 @@ class _RecordEditFormState extends State<RecordEditForm> {
   DateTime _selectedDate = DateTime.now();
   RecordUnits _selectedUnits = RecordUnits.POUNDS;
   int _repsQuantity = 6;
-  int _weightQuantity = 135;
 
   XFile? _pickedVideoFile;
   File? _pickedVideoThumbnailFile;
@@ -39,14 +39,14 @@ class _RecordEditFormState extends State<RecordEditForm> {
   TextEditingController? _exerciseTextController;
   TextEditingController? _notesTextController;
   TextEditingController? _weightQuantityTextController;
+  QuantityCreator? _quantityCreator;
 
   @override
   void initState() {
     super.initState();
     _selectedDate = widget.initialRecord?.date ?? DateTime.now();
-    _selectedUnits = widget.initialRecord?.quantity.units ?? RecordUnits.POUNDS;
+    // _selectedUnits = widget.initialRecord?.quantity.units ?? RecordUnits.POUNDS;
     _repsQuantity = widget.initialRecord?.reps ?? 6;
-    // _weightQuantity = widget.initialRecord?.quantity.amount ?? 135;
     _pickedVideoThumbnailFile = widget.initialRecord?.thumbnailUri != null
         ? _localMediaService
             .openFileFromDisk(widget.initialRecord!.thumbnailUri!)
@@ -55,8 +55,11 @@ class _RecordEditFormState extends State<RecordEditForm> {
         TextEditingController(text: widget.initialRecord?.exercise);
     _notesTextController =
         TextEditingController(text: widget.initialRecord?.notes);
-    _weightQuantityTextController = TextEditingController(
-        text: widget.initialRecord?.quantity.amount.toString());
+    // _weightQuantityTextController = TextEditingController(
+    //     text: widget.initialRecord?.quantity.amount.toString());
+    _quantityCreator = QuantityCreator(
+      initialQuantity: widget.initialRecord?.quantity,
+    );
   }
 
   @override
@@ -77,11 +80,12 @@ class _RecordEditFormState extends State<RecordEditForm> {
                 fit: FlexFit.tight,
                 child: notesForm(),
               ),
-              Flexible(flex: 4, fit: FlexFit.tight, child: unitsDropdown()),
-              Flexible(
-                  flex: 4,
-                  fit: FlexFit.tight,
-                  child: weightQuantityField(context)),
+              Flexible(fit: FlexFit.tight, flex: 4, child: _quantityCreator!),
+              // Flexible(flex: 4, fit: FlexFit.tight, child: unitsDropdown()),
+              // Flexible(
+              //     flex: 4,
+              //     fit: FlexFit.tight,
+              //     child: weightQuantityField(context)),
               Flexible(flex: 4, fit: FlexFit.tight, child: repsPicker()),
               Flexible(
                 flex: 4,
@@ -93,23 +97,19 @@ class _RecordEditFormState extends State<RecordEditForm> {
             ])));
   }
 
-  // TODO: SHOW the currently selected date, don't just confirm its selection
-  void _selectDate(DateTime? newSelectedDate) {
-    if (newSelectedDate != null) {
-      setState(() {
-        _selectedDate = newSelectedDate;
-      });
-    }
-  }
-
   Widget datePickerButton() {
-    return Scaffold(
-        body: Center(
-            child: PRTrackerDatePicker(
-      caption: 'Open date selector',
-      onDateSelected: _selectDate,
-      restorationId: 'record_edit_form',
-    )));
+    return ElevatedButton(
+      child: Text(DateFormat.yMd().format(_selectedDate)),
+      onPressed: () async {
+        DateTime? newDate = await showDatePicker(
+            context: context,
+            initialDate: _selectedDate,
+            firstDate: DateTime(1990),
+            lastDate: DateTime.now());
+        if (newDate == null) return;
+        setState(() => {_selectedDate = newDate});
+      },
+    );
   }
 
   Widget exerciseForm() {
@@ -129,7 +129,8 @@ class _RecordEditFormState extends State<RecordEditForm> {
       decoration: const InputDecoration(
           labelText: 'Notes', border: OutlineInputBorder()),
       controller: _notesTextController,
-      validator: (val) => val!.isNotEmpty ? null : 'Exercise must not be empty',
+      validator: (val) =>
+          val!.isNotEmpty ? null : 'Ex√ercise must not be empty',
     );
   }
 
@@ -190,10 +191,9 @@ class _RecordEditFormState extends State<RecordEditForm> {
   Future _pickVideo() async {
     final pickedVideoFile =
         await _videoPicker.pickVideo(source: ImageSource.gallery);
-    final pickedVideoThumbnailFile = pickedVideoFile != null
-        ? File((await _localMediaService
-            .generateThumbnailFromVideoFile(pickedVideoFile!))!)
-        : null;
+    if (pickedVideoFile == null) return;
+    final pickedVideoThumbnailFile = File((await _localMediaService
+        .generateThumbnailFromVideoFile(pickedVideoFile))!);
     setState(() {
       _pickedVideoFile = pickedVideoFile;
       _pickedVideoThumbnailFile = pickedVideoThumbnailFile;
