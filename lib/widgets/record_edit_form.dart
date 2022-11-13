@@ -80,15 +80,18 @@ class _RecordEditFormState extends State<RecordEditForm> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
+                      flex: 4,
+                      child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: weightQuantityField(context)),
+                    ),
+                    Expanded(
+                        flex: 4,
                         child: Padding(
                             padding: const EdgeInsets.all(20),
-                            child: weightQuantityField(context))),
-                    Flexible(
-                        child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: unitsDropdown()))
+                            child: unitsDropdown())),
+                    Expanded(flex: 4, child: repsPicker())
                   ]),
-              Flexible(flex: 4, fit: FlexFit.tight, child: repsPicker()),
               Flexible(
                 flex: 4,
                 fit: FlexFit.tight,
@@ -137,17 +140,15 @@ class _RecordEditFormState extends State<RecordEditForm> {
   }
 
   Widget weightQuantityField(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(20),
-        child: TextFormField(
-          controller: _weightQuantityTextController,
-          decoration: const InputDecoration(
-              labelText: 'Quantity', border: OutlineInputBorder()),
-          textAlign: TextAlign.center,
-          keyboardType: TextInputType.number,
-          style: Theme.of(context).textTheme.headline5,
-          validator: (value) => validateWeightQuantity(value!),
-        ));
+    return TextFormField(
+      controller: _weightQuantityTextController,
+      decoration: const InputDecoration(
+          labelText: 'Quantity', border: OutlineInputBorder()),
+      textAlign: TextAlign.center,
+      keyboardType: TextInputType.number,
+      style: Theme.of(context).textTheme.headline5,
+      validator: (value) => validateWeightQuantity(value!),
+    );
   }
 
   String? validateWeightQuantity(String? value) {

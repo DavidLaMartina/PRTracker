@@ -19,6 +19,10 @@ class RecordEditScreen extends StatelessWidget {
             as RecordEditScreenArguments)
         .initialRecord;
     return PRTrackerScaffold(
-        fab: null, child: RecordEditForm(initialRecord: initialRecord));
+        fab: null,
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: RecordEditForm(initialRecord: initialRecord),
+        ));
   }
 }
