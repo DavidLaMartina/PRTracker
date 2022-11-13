@@ -66,13 +66,9 @@ class _RecordEditFormState extends State<RecordEditForm> {
             child:
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               Flexible(
-                flex: 4,
-                fit: FlexFit.tight,
                 child: exerciseForm(),
               ),
               Flexible(
-                flex: 4,
-                fit: FlexFit.tight,
                 child: notesForm(),
               ),
               Row(
@@ -93,12 +89,12 @@ class _RecordEditFormState extends State<RecordEditForm> {
                     Expanded(flex: 4, child: repsPicker())
                   ]),
               Flexible(
-                flex: 4,
-                fit: FlexFit.tight,
-                child: datePickerButton(),
+                child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: datePickerButton()),
               ),
-              Flexible(flex: 4, fit: FlexFit.tight, child: videoPickerButton()),
-              Flexible(flex: 4, fit: FlexFit.tight, child: saveButton(context))
+              Flexible(child: videoPickerButton()),
+              Flexible(child: saveButton(context))
             ])));
   }
 
