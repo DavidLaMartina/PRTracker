@@ -130,8 +130,7 @@ class _RecordEditFormState extends State<RecordEditForm> {
       decoration: const InputDecoration(
           labelText: 'Notes', border: OutlineInputBorder()),
       controller: _notesTextController,
-      validator: (val) =>
-          val!.isNotEmpty ? null : 'Ex√ercise must not be empty',
+      validator: (val) => val!.isNotEmpty ? null : 'Notes must not be empty',
     );
   }
 

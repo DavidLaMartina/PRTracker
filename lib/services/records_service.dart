@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:path/path.dart';
+import 'package:prtracker/config/constants.dart';
+import 'package:prtracker/models/record_filter.dart';
+import 'package:prtracker/utils/string_utils.dart';
 import 'package:sembast/sembast.dart';
 import 'package:prtracker/models/record.dart';
 
@@ -73,5 +76,37 @@ class RecordsService extends ChangeNotifier {
         .query(finder: Finder(sortOrders: [SortOrder('date')]))
         .onSnapshots(_database)
         .transform(recordsTransformer);
+  }
+
+  Stream<List<Record>> onRecordsFilter(RecordFilter? filter) {
+    if (filter == null) {
+      return onRecords();
+    }
+    return _store
+        .query(
+            finder: Finder(
+                filter: Filter.and(buildRecordFilters(filter)),
+                sortOrders: [SortOrder('date')]))
+        .onSnapshots(_database)
+        .transform(recordsTransformer);
+  }
+
+  List<Filter> buildRecordFilters(RecordFilter filter) {
+    final List<Filter> filters = [];
+    if (!isNullOrEmpty(filter.exercise)) {
+      filters.add(Filter.matchesRegExp(
+          EXERCISE_KEY, RegExp(filter.exercise!, caseSensitive: false)));
+    }
+    if (filter.minReps != null) {
+      filters.add(Filter.greaterThanOrEquals(REPS_KEY, filter.minReps));
+    }
+    if (filter.maxReps != null) {
+      filters.add(Filter.lessThanOrEquals(REPS_KEY, filter.maxReps));
+    }
+    if (!isNullOrEmpty(filter.notesInclude)) {
+      filters.add(Filter.custom((record) =>
+          (record[NOTES_KEY] as String).contains(filter.notesInclude!)));
+    }
+    return filters;
   }
 }

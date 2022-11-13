@@ -3,15 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_it/get_it.dart';
 import 'package:prtracker/models/record.dart';
+import 'package:prtracker/models/record_filter.dart';
 import 'package:prtracker/screens/record_details_screen.dart';
 import 'package:prtracker/screens/record_edit_screen.dart';
 import 'package:prtracker/services/local_media_service.dart';
 import 'package:prtracker/services/records_service.dart';
 import 'package:prtracker/widgets/pr_tracker_scaffold.dart';
+import 'package:prtracker/widgets/record_filter_bar.dart';
 import '../utils/datetime_utils.dart';
 
 class RecordListScreen extends StatefulWidget {
   static const route = '/';
+
+  const RecordListScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -22,6 +26,12 @@ class _RecordsListScreenState extends State<RecordListScreen> {
   final RecordsService _recordsService = GetIt.I.get();
   final LocalMediaService _localMediaService = GetIt.I.get();
 
+  RecordFilter? _recordFilter;
+
+  void _onFilter(RecordFilter filter) {
+    setState(() => {_recordFilter = filter});
+  }
+
   @override
   initState() {
     super.initState();
@@ -30,22 +40,32 @@ class _RecordsListScreenState extends State<RecordListScreen> {
   @override
   Widget build(BuildContext context) {
     return PRTrackerScaffold(
-      fab: newRecordFab(context),
-      child: StreamBuilder<List<Record>>(
-          stream: _recordsService.onRecords(),
-          builder: (context, snapshot) {
-            var records = snapshot.data;
-            if (records == null) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            return ListView.builder(
-                itemCount: records.length,
-                itemBuilder: (context, index) {
-                  var record = records[index];
-                  return recordListTile(context, record);
-                });
-          }),
-    );
+        fab: newRecordFab(context),
+        child: Column(children: [
+          Flexible(
+            flex: 20,
+            child: RecordFilterBar(onFilter: _onFilter),
+          ),
+          Flexible(
+            flex: 9,
+            child: StreamBuilder<List<Record>>(
+                stream: _recordsService.onRecordsFilter(_recordFilter),
+                builder: (context, snapshot) {
+                  var records = snapshot.data;
+                  if (records == null) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return ListView.builder(
+                      itemCount: records.length,
+                      itemBuilder: (context, index) {
+                        var record = records[index];
+                        return recordListTile(context, record);
+                      });
+                }),
+          ),
+        ]));
+    child:
+    ;
   }
 
   // TODO: Different actions for L and R sliders?
