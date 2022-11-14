@@ -103,6 +103,9 @@ class RecordsService extends ChangeNotifier {
     if (filter.maxReps != null) {
       filters.add(Filter.lessThanOrEquals(REPS_KEY, filter.maxReps));
     }
+    // if (filter.minDate != null) {
+    //   filters.add(Filter.)
+    // }
     if (!isNullOrEmpty(filter.notesInclude)) {
       filters.add(Filter.custom((record) =>
           (record[NOTES_KEY] as String).contains(filter.notesInclude!)));
