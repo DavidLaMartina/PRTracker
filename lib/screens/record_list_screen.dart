@@ -43,7 +43,7 @@ class _RecordsListScreenState extends State<RecordListScreen> {
         fab: newRecordFab(context),
         child: Column(children: [
           Flexible(
-            flex: 20,
+            flex: 25,
             child: RecordFilterBar(onFilter: _onFilter),
           ),
           Flexible(

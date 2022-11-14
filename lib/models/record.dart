@@ -2,7 +2,7 @@ import 'package:prtracker/config/constants.dart';
 
 class Record {
   late int? id;
-  DateTime date;
+  DateTime? date;
   String exercise;
   RecordQuantity quantity;
   int reps;
@@ -22,7 +22,7 @@ class Record {
 
   Map<String, dynamic> toMap() {
     return {
-      DATE_KEY: date.toString(),
+      DATE_KEY: date?.millisecondsSinceEpoch,
       EXERCISE_KEY: exercise,
       QUANTITY_KEY: quantity.toMap(),
       REPS_KEY: reps,
@@ -35,7 +35,9 @@ class Record {
   factory Record.fromMap(int id, Map<String, dynamic> map) {
     return Record(
         id: id,
-        date: DateTime.parse(map[DATE_KEY]),
+        date: map[DATE_KEY] is int
+            ? DateTime.fromMillisecondsSinceEpoch(map[DATE_KEY])
+            : null,
         exercise: map[EXERCISE_KEY],
         quantity: RecordQuantity.fromMap(map[QUANTITY_KEY]),
         reps: map[REPS_KEY],

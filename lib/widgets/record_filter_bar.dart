@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:prtracker/models/record_filter.dart';
 
 class RecordFilterBar extends StatefulWidget {
@@ -16,9 +17,8 @@ class _RecordFilterBarState extends State<RecordFilterBar> {
   final TextEditingController _notesIncludeTextController =
       TextEditingController();
   RangeValues _repRangeValues = const RangeValues(0, 100);
-  late DateTime _minDate;
-  late DateTime _maxDate;
-  late String _notesInclude;
+  DateTime? _minDate;
+  DateTime? _maxDate;
   late bool _includesVideo;
 
   @override
@@ -54,6 +54,13 @@ class _RecordFilterBarState extends State<RecordFilterBar> {
                 )
               ],
             )),
+            Expanded(
+                child: Row(children: [
+              Expanded(
+                  child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: dateRangePicker()))
+            ])),
             Expanded(
                 child: Row(children: [
               Expanded(
@@ -103,7 +110,7 @@ class _RecordFilterBarState extends State<RecordFilterBar> {
         ElevatedButton(
           onPressed: (() => {
                 setState(() {
-                  resetRangeValues();
+                  resetRepRangeValues();
                 })
               }),
           child: const Text('Reset rep range'),
@@ -123,6 +130,94 @@ class _RecordFilterBarState extends State<RecordFilterBar> {
       minLines: null,
       maxLines: null,
     );
+  }
+
+  Widget dateRangePicker() {
+    return Column(children: [
+      Expanded(
+        child: Row(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(10),
+              child: Text('Latest date'),
+            ),
+            datePickerButton((DateTime? newMinDate) {
+              setState(() {
+                if (newMinDate != null) {
+                  _minDate = newMinDate;
+                }
+              });
+            }, _minDate, 'Select earliest date'),
+            Expanded(
+                child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: resetDateButton(context, 'Reset earliest date', (() {
+                setState(() {
+                  _minDate = null;
+                });
+              })),
+            ))
+          ],
+        ),
+      ),
+      Expanded(
+        child: Row(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(10),
+              child: Text('Earliest date'),
+            ),
+            datePickerButton((DateTime? newMaxDate) {
+              setState(() {
+                if (newMaxDate != null) {
+                  _maxDate = newMaxDate;
+                }
+              });
+            }, _maxDate, 'Select latest date'),
+            Expanded(
+              child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: resetDateButton(context, 'Reset latest date', (() {
+                    setState(() {
+                      _maxDate = null;
+                    });
+                  }))),
+            )
+          ],
+        ),
+      )
+    ]);
+  }
+
+  Widget datePickerButton(Function(DateTime?) onDateSelected,
+      DateTime? currentSelection, String altText) {
+    return ElevatedButton(
+        child: currentSelection != null
+            ? Text(DateFormat.yMd().format(currentSelection))
+            : Text(altText),
+        onPressed: () async {
+          DateTime? newDate = await showDatePicker(
+              context: context,
+              initialDate: currentSelection ?? DateTime.now(),
+              firstDate: DateTime(1990),
+              lastDate: DateTime.now());
+          if (newDate == null) return;
+          onDateSelected(newDate);
+        });
+  }
+
+  Widget resetDateButton(
+      BuildContext context, String labelText, void Function() onPressed) {
+    return SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: Semantics(
+            button: true,
+            enabled: true,
+            onLongPressHint: 'Reset date',
+            child: ElevatedButton(
+              onPressed: onPressed,
+              child: Text(labelText),
+            )));
   }
 
   Widget applyFilterButton(BuildContext context) {
@@ -162,16 +257,22 @@ class _RecordFilterBarState extends State<RecordFilterBar> {
   }
 
   void resetFilter() {
-    _exerciseTextController.text = '';
-    _notesIncludeTextController.text = '';
-    resetRangeValues();
     setState(() {
+      _exerciseTextController.text = '';
+      _notesIncludeTextController.text = '';
+      resetRepRangeValues();
+      resetDateValues();
       applyFilter();
     });
   }
 
-  void resetRangeValues() {
+  void resetRepRangeValues() {
     _repRangeValues = const RangeValues(0, 100);
+  }
+
+  void resetDateValues() {
+    _minDate = null;
+    _maxDate = null;
   }
 
   RecordFilter buildFilter() {
@@ -179,6 +280,8 @@ class _RecordFilterBarState extends State<RecordFilterBar> {
         exercise: _exerciseTextController.text,
         minReps: _repRangeValues.start.toInt(),
         maxReps: _repRangeValues.end.toInt(),
+        minDate: _minDate,
+        maxDate: _maxDate,
         notesInclude: _notesIncludeTextController.text);
   }
 }
