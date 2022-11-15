@@ -1,3 +1,4 @@
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:prtracker/models/record_filter.dart';
@@ -23,60 +24,70 @@ class _RecordFilterBarState extends State<RecordFilterBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: exerciseField(),
-                    ),
+    return ExpandablePanel(
+      header: const Text('Records Filter'),
+      collapsed: const SizedBox(height: 100, child: const Text('collapsed')),
+      expanded: LimitedBox(
+        maxHeight: 500,
+        child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: exerciseField(),
+                        ),
+                      ),
+                      Expanded(
+                          child: Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: repRangeSlider())),
+                    ],
                   ),
+                ),
+                Expanded(
+                    child: Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: notesSearchBox(),
+                      ),
+                    )
+                  ],
+                )),
+                Expanded(
+                    child: Row(children: [
                   Expanded(
                       child: Padding(
                           padding: const EdgeInsets.all(10),
-                          child: repRangeSlider())),
-                ],
-              ),
-            ),
-            Expanded(
-                child: Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: notesSearchBox(),
-                  ),
-                )
+                          child: dateRangePicker()))
+                ])),
+                SizedBox(
+                    height: 100,
+                    child: Row(children: [
+                      SizedBox(
+                        height: 50,
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: applyFilterButton(context),
+                        ),
+                      ),
+                      SizedBox(
+                          height: 50,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: resetFilterButton(context),
+                          ))
+                    ]))
               ],
             )),
-            Expanded(
-                child: Row(children: [
-              Expanded(
-                  child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: dateRangePicker()))
-            ])),
-            Expanded(
-                child: Row(children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: applyFilterButton(context),
-                ),
-              ),
-              Expanded(
-                  child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: resetFilterButton(context),
-              ))
-            ]))
-          ],
-        ));
+      ),
+    );
   }
 
   Widget exerciseField() {

@@ -42,12 +42,8 @@ class _RecordsListScreenState extends State<RecordListScreen> {
     return PRTrackerScaffold(
         fab: newRecordFab(context),
         child: Column(children: [
+          RecordFilterBar(onFilter: _onFilter),
           Flexible(
-            flex: 25,
-            child: RecordFilterBar(onFilter: _onFilter),
-          ),
-          Flexible(
-            flex: 9,
             child: StreamBuilder<List<Record>>(
                 stream: _recordsService.onRecordsFilter(_recordFilter),
                 builder: (context, snapshot) {
