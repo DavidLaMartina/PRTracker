@@ -39,9 +39,12 @@ class _RecordsListScreenState extends State<RecordListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return PRTrackerScaffold(
-        fab: newRecordFab(context),
-        child: Column(children: [
+    return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: const Text('PR Tracker'),
+        ),
+        body: Column(children: [
           RecordFilterBar(onFilter: _onFilter),
           Flexible(
             child: StreamBuilder<List<Record>>(
@@ -60,8 +63,6 @@ class _RecordsListScreenState extends State<RecordListScreen> {
                 }),
           ),
         ]));
-    child:
-    ;
   }
 
   // TODO: Different actions for L and R sliders?

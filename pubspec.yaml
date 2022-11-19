@@ -27,6 +27,9 @@ dependencies:
   video_thumbnail: ^0.5.3
   flutter_slidable: ^2.0.0
   expandable: ^5.0.1
+  material_color_utilities: ^0.1.5
+  flutter_bloc: ^8.1.1
+  dynamic_color: ^1.5.4
 
 dev_dependencies:
   flutter_test:

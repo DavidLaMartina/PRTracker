@@ -218,26 +218,20 @@ class _RecordEditFormState extends State<RecordEditForm> {
           button: true,
           enabled: true,
           onLongPressHint: 'Submit record',
-          child: ElevatedButtonTheme(
-            data: ElevatedButtonThemeData(
-                style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blue)),
-            child: ElevatedButton(
-              onPressed: (() async {
-                if (await validateAndSave()) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                        'Successfully ${widget.initialRecord == null ? 'saved' : 'updated'} record'),
-                  ));
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, RecordListScreen.route, (r) => false);
-                }
-              }),
-              child: Text(
-                widget.initialRecord == null ? 'Save' : 'Update',
-                style: Theme.of(context).textTheme.headline5,
-              ),
+          child: ElevatedButton(
+            onPressed: (() async {
+              if (await validateAndSave()) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(
+                      'Successfully ${widget.initialRecord == null ? 'saved' : 'updated'} record'),
+                ));
+                Navigator.pushNamedAndRemoveUntil(
+                    context, RecordListScreen.route, (r) => false);
+              }
+            }),
+            child: Text(
+              widget.initialRecord == null ? 'Save' : 'Update',
+              style: Theme.of(context).textTheme.headline5,
             ),
           ),
         ));

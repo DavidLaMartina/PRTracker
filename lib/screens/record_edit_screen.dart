@@ -9,19 +9,20 @@ class RecordEditScreenArguments {
 }
 
 class RecordEditScreen extends StatelessWidget {
-  static const route = 'newRecord';
+  static const route = '/editRecord';
+  Record? initialRecord;
 
-  const RecordEditScreen({super.key});
+  RecordEditScreen({super.key, this.initialRecord});
 
   @override
   Widget build(BuildContext context) {
-    final initialRecord = (ModalRoute.of(context)?.settings.arguments
-            as RecordEditScreenArguments)
-        .initialRecord;
+    final args = ModalRoute.of(context)?.settings.arguments;
+    final initialRecord =
+        args is RecordEditScreenArguments ? args.initialRecord : null;
     return PRTrackerScaffold(
         fab: null,
         child: Padding(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: RecordEditForm(initialRecord: initialRecord),
         ));
   }

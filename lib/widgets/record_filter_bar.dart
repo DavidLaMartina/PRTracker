@@ -26,7 +26,7 @@ class _RecordFilterBarState extends State<RecordFilterBar> {
   Widget build(BuildContext context) {
     return ExpandablePanel(
       header: const Text('Records Filter'),
-      collapsed: const SizedBox(height: 100, child: const Text('collapsed')),
+      collapsed: const SizedBox(height: 100, child: Text('collapsed')),
       expanded: LimitedBox(
         maxHeight: 500,
         child: Form(
