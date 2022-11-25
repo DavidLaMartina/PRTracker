@@ -259,8 +259,7 @@ class _RecordEditFormState extends State<RecordEditForm> {
       {String? videoUri, String? videoThumbnailUri}) async {
     return Record(
         date: _selectedDate,
-        quantity: RecordQuantity(
-            units: RecordUnits.POUNDS, amount: 23, perSide: false),
+        quantity: buildRecordQuantity(),
         reps: _repsQuantity,
         exercise: _exerciseTextController!.text,
         notes: _notesTextController!.text,

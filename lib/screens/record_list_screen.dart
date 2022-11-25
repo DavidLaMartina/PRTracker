@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get_it/get_it.dart';
@@ -45,7 +46,16 @@ class _RecordsListScreenState extends State<RecordListScreen> {
           title: const Text('PR Tracker'),
         ),
         body: Column(children: [
-          RecordFilterBar(onFilter: _onFilter),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: 400),
+            child: SingleChildScrollView(
+              child: ExpandablePanel(
+                header: const Text('Header'),
+                collapsed: const Text('Collapsed'),
+                expanded: RecordFilterBar(onFilter: _onFilter),
+              ),
+            ),
+          ),
           Flexible(
             child: StreamBuilder<List<Record>>(
                 stream: _recordsService.onRecordsFilter(_recordFilter),
@@ -73,8 +83,8 @@ class _RecordsListScreenState extends State<RecordListScreen> {
         startActionPane: recordListTileStartActionPane(context, record),
         endActionPane: recordListTileEndActionPane(context, record),
         child: ListTile(
-            title: Text('${dateOnlyString(record.date)} ${record.exercise}'),
-            subtitle: const Text('This is my subtitle.'),
+            title: Text(recordHeadingText(record)),
+            subtitle: Text('${dateOnlyString(record.date)}'),
             trailing: trailingImage(record),
             onTap: () => listItemOnTap(context, record)));
   }
@@ -91,6 +101,18 @@ class _RecordsListScreenState extends State<RecordListScreen> {
     } else {
       return null;
     }
+  }
+
+  String recordHeadingText(Record record) {
+    return '${record.exercise}: ${weightRepsDisplay(record)}';
+  }
+
+  String weightRepsDisplay(Record record) {
+    return '${weightQuantitydisplay(record.quantity)} x ${record.reps}';
+  }
+
+  String weightQuantitydisplay(RecordQuantity quantity) {
+    return '${quantity.amount} ${RecordUnitsMap[quantity.units]}';
   }
 
   ActionPane recordListTileStartActionPane(

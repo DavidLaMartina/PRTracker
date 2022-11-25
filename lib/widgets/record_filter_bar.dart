@@ -24,69 +24,65 @@ class _RecordFilterBarState extends State<RecordFilterBar> {
 
   @override
   Widget build(BuildContext context) {
-    return ExpandablePanel(
-      header: const Text('Records Filter'),
-      collapsed: const SizedBox(height: 100, child: Text('collapsed')),
-      expanded: LimitedBox(
-        maxHeight: 500,
-        child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: exerciseField(),
-                        ),
-                      ),
-                      Expanded(
-                          child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: repRangeSlider())),
-                    ],
-                  ),
-                ),
-                Expanded(
-                    child: Row(
+    return LimitedBox(
+      maxHeight: 500,
+      child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              Expanded(
+                child: Row(
                   children: [
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(10),
-                        child: notesSearchBox(),
+                        child: exerciseField(),
                       ),
-                    )
+                    ),
+                    Expanded(
+                        child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: repRangeSlider())),
                   ],
-                )),
-                Expanded(
-                    child: Row(children: [
+                ),
+              ),
+              Expanded(
+                  child: Row(
+                children: [
                   Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: notesSearchBox(),
+                    ),
+                  )
+                ],
+              )),
+              Expanded(
+                  child: Row(children: [
+                Expanded(
+                    child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: dateRangePicker()))
+              ])),
+              SizedBox(
+                  height: 100,
+                  child: Row(children: [
+                    SizedBox(
+                      height: 50,
                       child: Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: dateRangePicker()))
-                ])),
-                SizedBox(
-                    height: 100,
-                    child: Row(children: [
-                      SizedBox(
+                        padding: const EdgeInsets.all(10),
+                        child: applyFilterButton(context),
+                      ),
+                    ),
+                    SizedBox(
                         height: 50,
                         child: Padding(
                           padding: const EdgeInsets.all(10),
-                          child: applyFilterButton(context),
-                        ),
-                      ),
-                      SizedBox(
-                          height: 50,
-                          child: Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: resetFilterButton(context),
-                          ))
-                    ]))
-              ],
-            )),
-      ),
+                          child: resetFilterButton(context),
+                        ))
+                  ]))
+            ],
+          )),
     );
   }
 
