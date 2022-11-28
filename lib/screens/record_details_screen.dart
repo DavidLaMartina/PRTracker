@@ -1,17 +1,31 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:prtracker/models/record.dart';
 import 'package:prtracker/utils/datetime_utils.dart';
 import 'package:prtracker/widgets/pr_tracker_scaffold.dart';
+import 'package:prtracker/widgets/video_player_wrapper.dart';
+import 'package:video_player/video_player.dart';
 
 class RecordDetailsScreenArguments {
   final Record record;
   RecordDetailsScreenArguments({required this.record});
 }
 
-class RecordDetailsScreen extends StatelessWidget {
+class RecordDetailsScreen extends StatefulWidget {
   static const route = 'recordDetails';
 
   const RecordDetailsScreen({super.key});
+
+  @override
+  State<RecordDetailsScreen> createState() => _RecordDetailsScreenState();
+}
+
+class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +40,10 @@ class RecordDetailsScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
-              flex: 2,
-              child: detailsScreenWrapper(dateDisplay(context, record))),
+              child: record.videoUri != null
+                  ? VideoPlayerWrapper(videoUri: record.videoUri!)
+                  : const Placeholder()),
+          Expanded(child: detailsScreenWrapper(dateDisplay(context, record))),
         ],
       ),
     );

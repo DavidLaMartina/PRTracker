@@ -8,6 +8,7 @@ import 'package:prtracker/models/record.dart';
 import 'package:prtracker/screens/record_list_screen.dart';
 import 'package:prtracker/services/local_media_service.dart';
 import 'package:prtracker/services/records_service.dart';
+import 'package:prtracker/widgets/video_player_wrapper.dart';
 
 class RecordEditForm extends StatefulWidget {
   final Record? initialRecord;
@@ -94,7 +95,11 @@ class _RecordEditFormState extends State<RecordEditForm> {
                     child: datePickerButton()),
               ),
               Flexible(child: videoPickerButton()),
-              Flexible(child: saveButton(context))
+              Flexible(child: saveButton(context)),
+              Flexible(
+                  child: _pickedVideoFile != null
+                      ? VideoPlayerWrapper(videoUri: _pickedVideoFile!.path)
+                      : const Placeholder())
             ])));
   }
 

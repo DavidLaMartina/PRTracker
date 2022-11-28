@@ -9,7 +9,6 @@ import 'package:prtracker/screens/record_details_screen.dart';
 import 'package:prtracker/screens/record_edit_screen.dart';
 import 'package:prtracker/services/local_media_service.dart';
 import 'package:prtracker/services/records_service.dart';
-import 'package:prtracker/widgets/pr_tracker_scaffold.dart';
 import 'package:prtracker/widgets/record_filter_bar.dart';
 import '../utils/datetime_utils.dart';
 
