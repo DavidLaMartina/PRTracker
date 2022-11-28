@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:prtracker/models/record.dart';
 import 'package:prtracker/screens/record_edit_screen.dart';
+import 'package:prtracker/services/records_service.dart';
 import 'package:prtracker/utils/datetime_utils.dart';
 import 'package:prtracker/utils/string_utils.dart';
-import 'package:prtracker/widgets/record_edit_form.dart';
 import 'package:prtracker/widgets/video_player_wrapper.dart';
 
 class RecordDetailsScreenArguments {
-  final Record record;
-  RecordDetailsScreenArguments({required this.record});
+  // final Record record;
+  // RecordDetailsScreenArguments({required this.record});
+
+  final int recordId;
+  RecordDetailsScreenArguments({required this.recordId});
 }
 
 class RecordDetailsScreen extends StatefulWidget {
   static const route = 'recordDetails';
-
-  const RecordDetailsScreen({super.key});
 
   @override
   State<RecordDetailsScreen> createState() => _RecordDetailsScreenState();
 }
 
 class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
+  final RecordsService _recordsService = GetIt.I.get();
+
+  late Future<Record> _recordFuture;
+
   @override
   void initState() {
     super.initState();
@@ -28,35 +34,52 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final record = (ModalRoute.of(context)?.settings.arguments
+    final recordId = (ModalRoute.of(context)?.settings.arguments
             as RecordDetailsScreenArguments)
-        .record;
+        .recordId;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: titleWidget(context, record),
-        centerTitle: true,
-        actions: [editButton(record)],
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Row(children: [Expanded(child: weightRepsDisplay(context, record))]),
-          Expanded(
-            child: record.videoUri != null
-                ? VideoPlayerWrapper(videoUri: record.videoUri!)
-                : const Placeholder(),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: notesDisplay(context, record),
-              )
-            ],
-          )
-        ],
-      ),
+    _recordFuture = _recordsService.getRecord(recordId);
+
+    return FutureBuilder(
+      future: _recordFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
+          final snapshotRecord = snapshot.data!;
+          return Scaffold(
+              appBar: AppBar(
+                title: titleWidget(context, snapshotRecord),
+                centerTitle: true,
+                actions: [editButton(snapshotRecord)],
+              ),
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                          child: weightRepsDisplay(context, snapshotRecord))
+                    ],
+                  ),
+                  Expanded(
+                      child: snapshotRecord.videoUri != null
+                          ? VideoPlayerWrapper(
+                              videoUri: snapshotRecord.videoUri!)
+                          : const Placeholder()),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: notesDisplay(context, snapshotRecord),
+                      )
+                    ],
+                  )
+                ],
+              ));
+        } else {
+          return const CircularProgressIndicator();
+        }
+      },
     );
   }
 
@@ -75,7 +98,8 @@ class _RecordDetailsScreenState extends State<RecordDetailsScreen> {
 
   void onEditButtonPressed(BuildContext context, Record record) {
     Navigator.pushNamed(context, RecordEditScreen.route,
-        arguments: RecordEditScreenArguments(initialRecord: record));
+            arguments: RecordEditScreenArguments(initialRecord: record))
+        .then((_) => setState(() {}));
   }
 
   Widget titleWidget(BuildContext context, Record record) {

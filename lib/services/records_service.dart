@@ -57,6 +57,13 @@ class RecordsService extends ChangeNotifier {
     await _store.record(recordId).delete(_database);
   }
 
+  Future<Record> getRecord(int id) async {
+    return await _store
+        .record(id)
+        .get(_database)
+        .then((value) => Record.fromMap(id, value!));
+  }
+
   Future<List<Record>> getAllRecords() async {
     final snapshots = await _store.find(_database);
     return snapshots

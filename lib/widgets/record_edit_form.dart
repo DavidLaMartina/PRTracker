@@ -245,8 +245,10 @@ class _RecordEditFormState extends State<RecordEditForm> {
                   content: Text(
                       'Successfully ${widget.initialRecord == null ? 'saved' : 'updated'} record'),
                 ));
-                Navigator.pushNamedAndRemoveUntil(
-                    context, RecordListScreen.route, (r) => false);
+                // final newRecord = _recordsService.getRecord(id)
+                // Navigator.pop(context);
+                // Navigator.pushNamedAndRemoveUntil(
+                //     context, RecordListScreen.route, (r) => false);
               }
             }),
             child: Text(

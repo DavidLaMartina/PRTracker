@@ -152,7 +152,7 @@ class _RecordsListScreenState extends State<RecordListScreen> {
 
   void listItemOnTap(BuildContext context, Record record) {
     Navigator.pushNamed(context, RecordDetailsScreen.route,
-        arguments: RecordDetailsScreenArguments(record: record));
+        arguments: RecordDetailsScreenArguments(recordId: record.id!));
   }
 
   FloatingActionButton newRecordFab(BuildContext context) {
