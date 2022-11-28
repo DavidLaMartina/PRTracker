@@ -71,51 +71,93 @@ class _RecordEditFormState extends State<RecordEditForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.all(3),
-        child: Form(
-            key: _formKey,
-            child:
-                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Flexible(
-                child: exerciseForm(),
-              ),
-              Flexible(
-                child: notesForm(),
-              ),
-              Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      flex: 4,
-                      child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: weightQuantityField(context)),
-                    ),
-                    Expanded(
-                        flex: 4,
-                        child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: unitsDropdown())),
-                    Expanded(flex: 4, child: repsPicker())
-                  ]),
-              Flexible(
+    return Form(
+        key: _formKey,
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Row(
+            children: [
+              Expanded(
                 child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: datePickerButton()),
+                  padding: const EdgeInsets.all(5),
+                  child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxHeight: 50,
+                          maxWidth: MediaQuery.of(context).size.width),
+                      child: exerciseForm()),
+                ),
               ),
-              Flexible(child: videoPickerButton()),
-              Flexible(
-                  child: _pickedVideoFile != null
-                      ? VideoPlayerWrapper(videoUri: _pickedVideoFile!.path)
-                      : const SizedBox.shrink()),
-              Flexible(child: saveButton(context)),
-              // Flexible(
-              //     child: _pickedVideoFile != null
-              //         ? VideoPlayerWrapper(videoUri: _pickedVideoFile!.path)
-              //         : const Placeholder())
-            ])));
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxHeight: 100,
+                          maxWidth: MediaQuery.of(context).size.width),
+                      child: notesForm()),
+                ),
+              ),
+            ],
+          ),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 100),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: weightQuantityField(context)),
+                  ),
+                  Expanded(
+                      child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: unitsDropdown())),
+                  Expanded(child: repsPicker())
+                ]),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: datePickerButton(),
+              ),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(child: videoPickerButton()),
+            ],
+          ),
+          Expanded(
+              child: _pickedVideoFile != null
+                  ? VideoPlayerWrapper(videoUri: _pickedVideoFile!.path)
+                  : const SizedBox.shrink()),
+          Flexible(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 50),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: saveButton(context),
+                  )),
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: cancelButton(context),
+                  ))
+                ],
+              ),
+            ),
+          )
+        ]));
   }
 
   Widget datePickerButton() {
@@ -147,10 +189,10 @@ class _RecordEditFormState extends State<RecordEditForm> {
 
   Widget notesForm() {
     return TextFormField(
+      maxLines: 5,
       decoration: const InputDecoration(
           labelText: 'Notes', border: OutlineInputBorder()),
       controller: _notesTextController,
-      validator: (val) => val!.isNotEmpty ? null : 'Notes must not be empty',
     );
   }
 
@@ -232,31 +274,29 @@ class _RecordEditFormState extends State<RecordEditForm> {
   }
 
   Widget saveButton(BuildContext context) {
-    return SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: Semantics(
-          button: true,
-          enabled: true,
-          onLongPressHint: 'Submit record',
-          child: ElevatedButton(
-            onPressed: (() async {
-              if (await validateAndSave()) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text(
-                      'Successfully ${widget.initialRecord == null ? 'saved' : 'updated'} record'),
-                ));
-                // final newRecord = _recordsService.getRecord(id)
-                // Navigator.pop(context);
-                // Navigator.pushNamedAndRemoveUntil(
-                //     context, RecordListScreen.route, (r) => false);
-              }
-            }),
-            child: Text(
-              widget.initialRecord == null ? 'Save' : 'Update',
-              style: Theme.of(context).textTheme.headline5,
-            ),
-          ),
-        ));
+    return ElevatedButton(
+      onPressed: (() async {
+        if (await validateAndSave()) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                'Successfully ${widget.initialRecord == null ? 'saved' : 'updated'} record'),
+          ));
+        }
+      }),
+      child: Text(
+        widget.initialRecord == null ? 'Save' : 'Update',
+        style: Theme.of(context).textTheme.headline5,
+      ),
+    );
+  }
+
+  Widget cancelButton(BuildContext context) {
+    return ElevatedButton(
+      onPressed: (() {
+        Navigator.pop(context);
+      }),
+      child: Text('Cancel', style: Theme.of(context).textTheme.headline5),
+    );
   }
 
   Future<bool> validateAndSave() async {

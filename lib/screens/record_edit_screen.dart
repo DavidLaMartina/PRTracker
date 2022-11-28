@@ -19,11 +19,12 @@ class RecordEditScreen extends StatelessWidget {
     final args = ModalRoute.of(context)?.settings.arguments;
     final initialRecord =
         args is RecordEditScreenArguments ? args.initialRecord : null;
-    return PRTrackerScaffold(
-        fab: null,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: RecordEditForm(initialRecord: initialRecord),
-        ));
+    return Scaffold(
+      appBar: AppBar(title: Text('Edit Record')),
+      body: Padding(
+        padding: const EdgeInsets.all(5),
+        child: RecordEditForm(initialRecord: initialRecord),
+      ),
+    );
   }
 }
