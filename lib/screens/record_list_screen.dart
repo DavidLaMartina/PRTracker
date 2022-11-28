@@ -49,8 +49,8 @@ class _RecordsListScreenState extends State<RecordListScreen> {
             constraints: BoxConstraints(maxHeight: 400),
             child: SingleChildScrollView(
               child: ExpandablePanel(
-                header: const Text('Header'),
-                collapsed: const Text('Collapsed'),
+                header: const Text('Records Filter'),
+                collapsed: const SizedBox.shrink(),
                 expanded: RecordFilterBar(onFilter: _onFilter),
               ),
             ),

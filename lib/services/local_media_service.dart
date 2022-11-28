@@ -43,6 +43,10 @@ class LocalMediaService {
         quality: 50);
   }
 
+  XFile? openXFileFromDisk(String relativePath) {
+    return XFile(path.join(appDirPath, relativePath));
+  }
+
   File openFileFromDisk(String relativePath) {
     final file = File(path.join(appDirPath, relativePath));
     return file;

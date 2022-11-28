@@ -46,6 +46,7 @@ class _RecordEditFormState extends State<RecordEditForm> {
     _selectedDate = widget.initialRecord?.date ?? DateTime.now();
     _selectedUnits = widget.initialRecord?.quantity.units ?? RecordUnits.POUNDS;
     _repsQuantity = widget.initialRecord?.reps ?? 6;
+    _setInitialVideo();
     _pickedVideoThumbnailFile = widget.initialRecord?.thumbnailUri != null
         ? _localMediaService
             .openFileFromDisk(widget.initialRecord!.thumbnailUri!)
@@ -56,6 +57,14 @@ class _RecordEditFormState extends State<RecordEditForm> {
         TextEditingController(text: widget.initialRecord?.notes);
     _weightQuantityTextController = TextEditingController(
         text: widget.initialRecord?.quantity.amount.toString());
+  }
+
+  void _setInitialVideo() {
+    if (widget.initialRecord != null &&
+        widget.initialRecord!.videoUri != null) {
+      _pickedVideoFile =
+          _localMediaService.openXFileFromDisk(widget.initialRecord!.videoUri!);
+    }
   }
 
   @override
