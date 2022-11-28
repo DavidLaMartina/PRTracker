@@ -73,7 +73,7 @@ class _RecordEditFormState extends State<RecordEditForm> {
   Widget build(BuildContext context) {
     return Form(
         key: _formKey,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
           Row(
             children: [
               Expanded(
@@ -132,10 +132,14 @@ class _RecordEditFormState extends State<RecordEditForm> {
               Expanded(child: videoPickerButton()),
             ],
           ),
-          Expanded(
-              child: _pickedVideoFile != null
-                  ? VideoPlayerWrapper(videoUri: _pickedVideoFile!.path)
-                  : const SizedBox.shrink()),
+          _pickedVideoFile != null
+              ? Expanded(
+                  child: ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 400),
+                      child:
+                          VideoPlayerWrapper(videoUri: _pickedVideoFile!.path)),
+                )
+              : const SizedBox.shrink(),
           Flexible(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 50),

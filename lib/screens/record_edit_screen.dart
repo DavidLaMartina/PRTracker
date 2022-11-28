@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:prtracker/models/record.dart';
-import 'package:prtracker/widgets/pr_tracker_scaffold.dart';
 import 'package:prtracker/widgets/record_edit_form.dart';
 
 class RecordEditScreenArguments {
@@ -22,9 +21,29 @@ class RecordEditScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('Edit Record')),
       body: Padding(
-        padding: const EdgeInsets.all(5),
-        child: RecordEditForm(initialRecord: initialRecord),
-      ),
+          padding: const EdgeInsets.all(5),
+          // Use of SingleChildScrollView adapated from
+          // https://api.flutter.dev/flutter/widgets/SingleChildScrollView-class.html
+          child: LayoutBuilder(
+            builder:
+                (BuildContext context, BoxConstraints viewportConstraints) {
+              return SingleChildScrollView(
+                  child: ConstrainedBox(
+                constraints:
+                    BoxConstraints(minHeight: viewportConstraints.maxHeight),
+                child: IntrinsicHeight(
+                    child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                        child: RecordEditForm(
+                      initialRecord: initialRecord,
+                    ))
+                  ],
+                )),
+              ));
+            },
+          )),
     );
   }
 }
