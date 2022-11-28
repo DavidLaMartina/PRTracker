@@ -23,13 +23,17 @@ class _VideoPlayerWrapperState extends State<VideoPlayerWrapper> {
   @override
   void initState() {
     super.initState();
-    _videoController = VideoPlayerController.file(
-        _localMediaService.openFileFromDisk(widget.videoUri));
-    _initializeVideoPlayerFuture = _videoController.initialize();
+    _initVideoController();
     // We're waiting until the build to set up the chewie controller
     // because until the video player control inits, we don't have access
     // to the true aspect ratio, which the Chewie Controller requires
     // TODO: Write better version of chewie controller
+  }
+
+  void _initVideoController() {
+    _videoController = VideoPlayerController.file(
+        _localMediaService.openFileFromDisk(widget.videoUri));
+    _initializeVideoPlayerFuture = _videoController.initialize();
   }
 
   void _setupChewieController() {
@@ -57,6 +61,9 @@ class _VideoPlayerWrapperState extends State<VideoPlayerWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      _initVideoController();
+    });
     return Scaffold(
         body: FutureBuilder(
             future: _initializeVideoPlayerFuture,

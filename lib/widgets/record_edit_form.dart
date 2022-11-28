@@ -62,8 +62,10 @@ class _RecordEditFormState extends State<RecordEditForm> {
   void _setInitialVideo() {
     if (widget.initialRecord != null &&
         widget.initialRecord!.videoUri != null) {
-      _pickedVideoFile =
-          _localMediaService.openXFileFromDisk(widget.initialRecord!.videoUri!);
+      setState(() {
+        _pickedVideoFile = _localMediaService
+            .openXFileFromDisk(widget.initialRecord!.videoUri!);
+      });
     }
   }
 
@@ -104,11 +106,15 @@ class _RecordEditFormState extends State<RecordEditForm> {
                     child: datePickerButton()),
               ),
               Flexible(child: videoPickerButton()),
-              Flexible(child: saveButton(context)),
               Flexible(
                   child: _pickedVideoFile != null
                       ? VideoPlayerWrapper(videoUri: _pickedVideoFile!.path)
-                      : const Placeholder())
+                      : const SizedBox.shrink()),
+              Flexible(child: saveButton(context)),
+              // Flexible(
+              //     child: _pickedVideoFile != null
+              //         ? VideoPlayerWrapper(videoUri: _pickedVideoFile!.path)
+              //         : const Placeholder())
             ])));
   }
 
@@ -216,7 +222,7 @@ class _RecordEditFormState extends State<RecordEditForm> {
         onPressed: () async {
           await _pickVideo();
         },
-        child: thumbnailDisplay());
+        child: const Text('Select video'));
   }
 
   Widget thumbnailDisplay() {
